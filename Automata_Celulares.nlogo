@@ -3,12 +3,13 @@ to setup
   ;; Limpia el mapa, en caso de estar usado.
   clear-all
 
-  ;; llama a los activadores del estado inicial de los agentes/Hospitales/Casas/patches.
+  ;; llama a las funciones que instancian el estado inicial de los agentes/Hospitales/Casas/patches.
   setHospitales
   setCasaPobre
   setCasaMedia
   setCasaAlta
 
+  ;; llama a la funcion que crea loa agentes turtles/personas/población.
   setPoblacion
 end
 
@@ -35,7 +36,7 @@ end
 
 ;; instancia los agentes de ingresos bajos con color rojo
 to setCasaPobre
-  repeat 33 [
+  repeat N-casa-pobre [
     ask patches with [pxcor = random-pxcor and pycor = random-pycor and pcolor = black]
     [
       set pcolor red
@@ -45,7 +46,7 @@ end
 
 ;; instancia los agentes de ingresos medios con color amarillo
 to setCasaMedia
-  repeat 33 [
+  repeat N-casa-media [
     ask patches with [pxcor = random-pxcor and pycor = random-pycor and pcolor = black]
     [
       set pcolor yellow
@@ -62,6 +63,7 @@ to setCasaAlta
     ]
   ]
 end
+
 
 ;; Este procedimiento es el encargado de la transicion entre estados de los diferentes angentes
 to step
