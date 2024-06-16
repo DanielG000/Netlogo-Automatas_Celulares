@@ -3,23 +3,38 @@ to setup
   ;; Limpia el mapa, en caso de estar usado.
   clear-all
 
-  ;;;; Se define el tamaño del mundo, por ende el numero de agentes/zonas.
-  ;;ask patches [
-  ;;  ;; Crashea al no saber como cambiar el valor por defecto de 'max-pxcor' 'min-pxcor' 'max-pycor' 'min-pycor'.
-  ;;  set max-pxcor max-x
-  ;;  set max-pycor max-y
-  ;;  set min-pxcor (-1 * max-x)
-  ;;  set min-pycor (-1 * max-y)
-  ;;]
+  ;; llama a los activadores del estado inicial de los agentes/Hospitales/Casas/patches.
+  setHospitales
+  setCasaPobre
+  setCasaMedia
+  setCasaAlta
 
-  ;; llama a los activadores del estado inicial de los agentes/zonas/patches.
-  setlow
-  setmid
-  settop
+  setPoblacion
+end
+
+;; Crea la poblacion con agentes turtles.
+to setPoblacion
+  set-default-shape turtles "circle"
+  create-turtles N-poblacion [
+    setxy random-pxcor random-pycor
+    set color white
+    set size ((random 3 * 0.30) + 0.30)
+    ;;set edad (1 + (random 99))
+  ]
+end
+
+
+;; instancia aleatoriamente la cantidad de hospitales indicados.
+to setHospitales
+  repeat N-hospitales [
+    ask patches with [pxcor = random-pxcor and pycor = random-pycor and pcolor = black][
+      set pcolor blue
+    ]
+  ]
 end
 
 ;; instancia los agentes de ingresos bajos con color rojo
-to setlow
+to setCasaPobre
   repeat 33 [
     ask patches with [pxcor = random-pxcor and pycor = random-pycor and pcolor = black]
     [
@@ -29,7 +44,7 @@ to setlow
 end
 
 ;; instancia los agentes de ingresos medios con color amarillo
-to setmid
+to setCasaMedia
   repeat 33 [
     ask patches with [pxcor = random-pxcor and pycor = random-pycor and pcolor = black]
     [
@@ -39,8 +54,8 @@ to setmid
 end
 
 ;; instancia los agentes de ingresos altos con color verde
-to settop
-  repeat 33 [
+to setCasaAlta
+  repeat N-casa-alta [
     ask patches with [pxcor = random-pxcor and pycor = random-pycor and pcolor = black]
     [
       set pcolor green
@@ -97,36 +112,6 @@ NIL
 NIL
 1
 
-SLIDER
-11
-46
-183
-79
-max-x
-max-x
-0
-50
-20.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-11
-78
-183
-111
-max-y
-max-y
-0
-50
-20.0
-1
-1
-NIL
-HORIZONTAL
-
 BUTTON
 91
 326
@@ -154,15 +139,80 @@ Configuración
 0.0
 1
 
-TEXTBOX
-12
-33
-162
-51
-Tamaño del mundo
-8
-0.0
+SLIDER
+11
+94
+183
+127
+N-poblacion
+N-poblacion
+0
+1000
+210.0
 1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+11
+132
+183
+165
+N-hospitales
+N-hospitales
+0
+15
+3.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+12
+214
+184
+247
+N-casa-media
+N-casa-media
+0
+100
+30.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+11
+254
+183
+287
+N-casa-alta
+N-casa-alta
+0
+100
+30.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+11
+174
+183
+207
+N-casa-pobre
+N-casa-pobre
+0
+100
+30.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
