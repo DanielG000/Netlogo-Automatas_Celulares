@@ -9,11 +9,13 @@ Pasos para ejecutar el modelo de solucion.
 
 Abrir el programa.
 
-Oprimir la teclas "Ctrl + O" y seleccionar el archivo 'Automatas\_Celulares.Nlogo'
+Oprimir la teclas "Ctrl + O" y seleccionar el archivo 'Automatas\_Celulares.nlogo'
 
-Oprimir el Boton "Inicio" en la interfaz.
+Oprimir el Boton "setup" en la interfaz para inicializar de manera aleatoria.
 
-Oprimir el Boton "Salto" para darle la orden a los automatas que cambien de estado.
+Oprimir el Boton "go-once" para darle la orden a los automatas que cambien de estado paso a paso.
+
+Con oprimir el Boton "go" se hace la transición de manera repetida y continua.
 
 ### Funcionamiento
 
