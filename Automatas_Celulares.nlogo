@@ -17,7 +17,7 @@ jobs-own [utility]
 ;; calidad, precio, distancia a trabajo, typo de barrio, color del barrio segun precio
 patches-own [quality price sd-dist type-neighborhood color-neighborhood]
 ;; contador, modo de vista
-globals [counter view-mode min-poor-util max-poor-util min-rich-util max-rich-util ]
+globals [counter view-mode]
 
 
 to setup
@@ -538,25 +538,32 @@ to evaluate-poor
   set utility-p [ patch-utility-for-poor ] of best-candidate
 end
 
+;; formula para calcular la utilidad de los pobres al vivir en ese barrio
 to-report patch-utility-for-poor
     report ( ( 1 / (sd-dist / 100 + 0.1) ) ^ ( 1 - price-priority ) ) * ( ( 1 / price ) ^ ( 1 + price-priority ) )
 end
 
+;; evalua y ubica la persona clase media en dicha casilla
 to evaluate-mid
+  ;; selecciona los barrios candidatos, la cantidad depende dela barra deslizable de la interfaz.
   let candidate-patches n-of number-of-tests patches
+  ;; filtra y guarda los barrios vacios.
   set candidate-patches candidate-patches with [ not any? turtles-here ]
+
+  ;; si no hay candidatos se detiene
   if (not any? candidate-patches)
     [ stop ]
 
-  ;; we use a hedonistic utility function for our agents, shown below
-  ;; basically, rich people are looking for good quality real estate, close to jobs
+  ;; elije uno de los candidatos, calculando la mejor utilidad
   let best-candidate max-one-of candidate-patches
         [ patch-utility-for-mid ]
+  ;; se mueve al barrio candidato
   move-to best-candidate
+  ;; guarda la utilidad del clase media en ese barrio.
   set utility-m [ patch-utility-for-mid ] of best-candidate
 end
 
-
+;; calcula la utilidad segun el precio y la calidad para promediando entre las 2 variables.
 to-report patch-utility-for-mid
   let quality-component ( ( 1 / (sd-dist + 0.1) ) ^ ( 1 - quality-priority ) ) * ( quality ^ ( 1 + quality-priority) )
   let price-component ( ( 1 / (sd-dist / 100 + 0.1) ) ^ ( 1 - price-priority ) ) * ( ( 1 / price ) ^ ( 1 + price-priority ) )
@@ -564,21 +571,27 @@ to-report patch-utility-for-mid
 end
 
 
+;; evalua y ubica el rico en un barrio
 to evaluate-rich
+  ;; elije N candidatos a partir de la barra deslizable de la interfaz
   let candidate-patches n-of number-of-tests patches
+  ;; filtra y guarda los candidatos sin habitantes
   set candidate-patches candidate-patches with [ not any? turtles-here ]
+  ;; si no hay candidatos se detiene
   if (not any? candidate-patches)
     [ stop ]
 
-  ;; we use a hedonistic utility function for our agents, shown below
-  ;; basically, rich people are looking for good quality real estate, close to jobs
+  ;; elije el mejor candidato segun la utilidad
   let best-candidate max-one-of candidate-patches
         [ patch-utility-for-rich ]
+  ;; se mueve al candidato elejido
   move-to best-candidate
+  ;; guarda la utilidad del rico en ese barrio
   set utility-r [ patch-utility-for-rich ] of best-candidate
 end
 
 
+;; la formula para calcular la utilidad que les queda a los ricos al vivir en ese barrio
 to-report patch-utility-for-rich
   report ( ( 1 / (sd-dist + 0.1) ) ^ ( 1 - quality-priority ) ) * ( quality ^ ( 1 + quality-priority) )
 end
