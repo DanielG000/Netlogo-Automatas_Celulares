@@ -195,8 +195,8 @@ to setup-mid
     ;; los ubica de manera semi aleatoria en un radio usando la siguiente formula ((r/2) - (a)) siendo 'a' un aleatorio decimal
     let radius 10
     setxy ( ( radius / 2 ) - random-float ( radius * 1.0 ) ) ( ( radius / 2 ) - random-float ( radius * 1.0 ) )
-    ;; incrementa el precio de los barrios
-    raise-price
+    ;; disminuye el precio de los barrios
+    decrease-price
     ;; incrementa la calidad de los barrios
     raise-value
   ]
@@ -488,8 +488,8 @@ to locate-mid
     set age random 100
     ;; ubica en el mejor barrio calidad precio
     evaluate-mid
-    ;; incrementa el precio de los barrios
-    raise-price
+    ;; disminuye el precio de los barrios
+    decrease-price
     ;; incrementa la calidad de los barrios
     raise-value
   ]
@@ -565,8 +565,8 @@ end
 
 ;; calcula la utilidad segun el precio y la calidad para promediando entre las 2 variables.
 to-report patch-utility-for-mid
-  let quality-component ( ( 1 / (sd-dist + 0.1) ) ^ ( 1 - quality-priority ) ) * ( quality ^ ( 1 + quality-priority) )
-  let price-component ( ( 1 / (sd-dist / 100 + 0.1) ) ^ ( 1 - price-priority ) ) * ( ( 1 / price ) ^ ( 1 + price-priority ) )
+  let quality-component ( ( 1 / (sd-dist + 0.1) ) ^ ( 1 - (quality-priority - 1) ) ) * ( quality ^ ( 1 + (quality-priority - 1)) )
+  let price-component ( ( 1 / (sd-dist / 100 + 0.1) ) ^ ( 1 - (price-priority + 1) ) ) * ( ( 1 / price ) ^ ( 1 + (price-priority + 1) ) )
   report (quality-component + price-component) / 2
 end
 
