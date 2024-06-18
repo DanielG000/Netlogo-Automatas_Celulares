@@ -2,12 +2,12 @@
 breed [ rich a-rich ]
 breed [ poor a-poor ]
 breed [ mid a-mid ]
-breed [ jobs job ] ;; jobs are places of employment held by many people
-breed [university a-university]
-breed [school a-school]
-breed [store a-store]
-breed [hospital a-hospital]
-breed [industry a-industry]
+breed [ jobs job ] ;; Los trabajos son lugares que emplean varias personas.
+breed [university a-university] ;; Lugares que incrementan la educacion de las personas.
+breed [school a-school]  ;; Lugares que incrementan la educacion de las personas.
+breed [store a-store]  ;; Lugares de desvalorizan las viviendas al volverse comercial.
+breed [hospital a-hospital] ;; Lugares que valorizan el precio y la calidad de las personas cercanas.
+breed [industry a-industry]  ;; Lugares que ofrecen servicios que cuestan y desvalorizan las cercanias.
 
 ;; Propiedades / Variables de cada agente
 rich-own [utility-r age education]
@@ -83,7 +83,7 @@ to setup
     decrease-value
   ]
   ;; crea 5 agentes de raza hospital
-    create-hospital 5 [
+    create-hospital number-hospital [
     ;; ubicacion aleatoria
     setxy random-xcor random-ycor
     ;; color rojo
@@ -98,7 +98,7 @@ to setup
     further-raise-value
   ]
   ;; crea las industrias/servicios
-      create-industry 5 [
+      create-industry number-industry [
     ;; ubicacion aleatoria
     setxy random-xcor random-ycor
     ;; color rojo oscuro
@@ -940,7 +940,7 @@ poor-per-step
 poor-per-step
 0
 15
-8.0
+5.0
 1
 1
 NIL
@@ -955,7 +955,7 @@ rich-per-step
 rich-per-step
 0
 15
-1.0
+5.0
 1
 1
 NIL
@@ -1076,7 +1076,7 @@ mid-per-step
 mid-per-step
 0
 15
-1.0
+5.0
 1
 1
 NIL
@@ -1087,7 +1087,7 @@ MONITOR
 385
 180
 430
-NIL
+mid pop
 count mid
 17
 1
@@ -1235,6 +1235,36 @@ NIL
 NIL
 NIL
 1
+
+SLIDER
+20
+265
+180
+298
+number-industry
+number-industry
+0
+15
+5.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+20
+300
+180
+333
+number-hospital
+number-hospital
+0
+15
+5.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 @#$#@#$#@
