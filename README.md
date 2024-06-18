@@ -17,6 +17,22 @@ Pasos para ejecutar el modelo de solucion.
 
 6. Con oprimir el Boton "go" se hace la transición de manera repetida/animada.
 
+### Alternativa
+
+En caso de que no puedas o no quieras instalar Netlogo, puedes abrirlo de forma web [aquí](https://www.netlogoweb.org/launch).
+
+1. Descargar el archivo Automatas\_Celulares.nlogo en formato zip.
+
+2. Descomprimes el archivo.
+
+3. Abres la version de [Netlogo-WEB](https://www.netlogoweb.org/launch)
+
+4. Oprimir el Boton 'Choose File'.
+
+5. Seleccionar el archivo 'Automatas\_Celulares.nlogo'
+
+6. seguir los mismos pasos del otro metodo a partir del paso numero 4.
+
 
 ## Integrantes
 
