@@ -5,21 +5,17 @@
 
 Pasos para ejecutar el modelo de solucion.
 
-[Descargar](https://ccl.northwestern.edu/netlogo/download.shtml) e instalar el programa Netlogo
+1. Descargar e instalar el programa [Netlogo](https://ccl.northwestern.edu/netlogo/download.shtml)
 
-Abrir el programa.
+2. Abrir el programa.
 
-Oprimir la teclas "Ctrl + O" y seleccionar el archivo 'Automatas\_Celulares.nlogo'
+3. Oprimir la teclas "Ctrl + O" y seleccionar el archivo 'Automatas\_Celulares.nlogo'
 
-Oprimir el Boton "setup" en la interfaz para inicializar de manera aleatoria.
+4. Oprimir el Boton "setup" en la interfaz para inicializar de manera aleatoria.
 
-Oprimir el Boton "go-once" para darle la orden a los automatas que cambien de estado paso a paso.
+5. Oprimir el Boton "go-once" para darle la orden a los automatas que cambien de estado paso a paso.
 
-Con oprimir el Boton "go" se hace la transición de manera repetida y continua.
-
-### Funcionamiento
-
-Las barras deslizadoras "max-x" & "max-y" son para configurar el tamaño del mundo. por ende la cantidad de celdas/automatas/patches.
+6. Con oprimir el Boton "go" se hace la transición de manera repetida/animada.
 
 
 ## Integrantes

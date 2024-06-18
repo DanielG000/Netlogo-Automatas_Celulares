@@ -1,3 +1,4 @@
+;; razas
 breed [ rich a-rich ]
 breed [ poor a-poor ]
 breed [ mid a-mid ]
@@ -8,253 +9,404 @@ breed [store a-store]
 breed [hospital a-hospital]
 breed [industry a-industry]
 
+;; Propiedades / Variables de cada agente
 rich-own [utility-r age education]
 poor-own [utility-p age education]
 mid-own [utility-m age education]
 jobs-own [utility]
-patches-own [quality price sd-dist]
+;; calidad, precio, distancia a trabajo, typo de barrio, color del barrio segun precio
+patches-own [quality price sd-dist type-neighborhood color-neighborhood]
+;; contador, modo de vista
 globals [counter view-mode min-poor-util max-poor-util min-rich-util max-rich-util ]
 
 
 to setup
+  ;; limpia el mapa/mundo
   clear-all
+  ;; inicia el modo de vista por calidad del barrio
   set view-mode "quality"
+  ;; crea trabajos
   setup-jobs
+  ;; inicializa los barrios
   setup-patches
+  ;; crea los ricos
   setup-rich
+  ;; crea los clase media
   setup-mid
+  ;; crea los pobres
   setup-poor
+
+  ;; crea N escuelas/universidades segun la barra deslizable de la interfaz.
   create-university number-university [
+    ;; les da una ubicacion aleatoria
     setxy random-xcor random-ycor
+    ;; se le da un color rosado muy oscuro
     set color 131
+    ;; defina la forma de la universidad
     set shape "university"
+    ;; tamaño
     set size 2
+    ;; valoriza los barrios cercanos.
     further-raise-price
+    ;; incrementa la calidad
     further-raise-value
-  ]
-    create-school number-school [
-    setxy random-xcor random-ycor
-    set color violet
-    set shape "school"
-    set size 1
-    raise-price
-    raise-value
   ]
 
-    create-store number-store [
+  ;; crea N escuelas segun la barra deslizable de la interfaz
+    create-school number-school [
+    ;; ubicacion aleatoria
     setxy random-xcor random-ycor
+    ;; color violeta predefinido
+    set color violet
+    ;; forma
+    set shape "school"
+    ;; tramaño de 1 unidad
+    set size 1
+    ;; incrementa el valor de los barrios
+    raise-price
+    ;; incrementa la calidad de los barrios
+    raise-value
+  ]
+  ;; crea N tiendas dependiendo la barra deslizable de la interfaz
+    create-store number-store [
+    ;; ubicacion aleatoria
+    setxy random-xcor random-ycor
+    ;; color anaranjado
     set color 25
+    ;; forma de tienda
     set shape "store"
+    ;; tamaño 2 unidades
     set size 2
+    ;; disminuye el valor de los barrios
     decrease-price
+    ;; disminuye la calidad de los barrios
     decrease-value
   ]
+  ;; crea 5 agentes de raza hospital
     create-hospital 5 [
+    ;; ubicacion aleatoria
     setxy random-xcor random-ycor
+    ;; color rojo
     set color 14
+    ;; forma de ambulancia
     set shape "ambulance"
+    ;; tamaño de 3 unidades
     set size 3
+    ;; incrementa el valor de los barrios cercanos
     further-raise-price
+    ;; incrementa la calidad de los barrios cercanos
     further-raise-value
   ]
+  ;; crea las industrias/servicios
       create-industry 5 [
+    ;; ubicacion aleatoria
     setxy random-xcor random-ycor
+    ;; color rojo oscuro
     set color 12
+    ;; forma de icono de alarma
     set shape "warning"
+    ;; tamaño 2 unidades
     set size 2
+    ;; reduce el precio de los barrios
     further-decrease-price
+    ;; reduce la calidad de los barrios
     further-decrease-value
   ]
 
+  ;; pinta los barrios segun el modo de vista.
   ask patches [ update-patch-color ]
+
+  ;; reinicia los tick que se usan para generar un paso a paso rapido y continuo.
   reset-ticks
 end
 
+
+;; crea los trabajos
 to setup-jobs
+  ;; crea 1 trabajo
   create-jobs 1
   ask jobs
   [
+    ;; les asigna color rojo
     set color red
+    ;; forma de fabrica
     set shape "factory"
+    ;; tamaño de 2 unidades
     set size 2
   ]
 end
 
+;; inicialia los barrios
 to setup-patches
   ask patches [
+    ;; todos inician con una calidad y precio de 40
     set quality 40
     set price 40
   ]
+
+  ;; se les asigna una distancia teniendo en cuenta el trabajo mas cercano
   ask patches
   [
+    ;; sd-dist es la variable que guarda la distancia
     set sd-dist min [distance myself] of jobs
   ]
 end
 
+
+;; crea los ricos
 to setup-rich
+  ;;inicialmente crea 5 ricos
   create-rich 5
   ask rich
   [
+    ;; les asigan un color magenta
     set color 126
+    ;; forma de cada
     set shape "house"
+    ;; edad entre 0 y 99 años
     set age random 100
+    ;; educacion inicialmente vacia
     set education 0
+    ;; define el radio para ubicarlos en una region cercana
     let radius 10
+    ;; los ubica de una manera semi aleatoria en una region
     setxy ( ( radius / 2 ) - random-float ( radius * 1.0 ) ) ( ( radius / 2 ) - random-float ( radius * 1.0 ) )
+    ;; incrementa el precio de los barrios
     further-raise-price
+    ;; incrementa la calidad de los barrios
     further-raise-value
   ]
 end
 
-
+;; crea los clase media
 to setup-mid
+  ;; crea 5 clase media
   create-mid 5
   ask mid
   [
+    ;; les da un color cyan
     set color 85
+    ;; forma de casa
     set shape "house"
+    ;; edad entre 0 y 99 años
     set age random 100
+    ;; educacion vacia incialmente
     set education 0
+    ;; los ubica de manera semi aleatoria en un radio usando la siguiente formula ((r/2) - (a)) siendo 'a' un aleatorio decimal
     let radius 10
     setxy ( ( radius / 2 ) - random-float ( radius * 1.0 ) ) ( ( radius / 2 ) - random-float ( radius * 1.0 ) )
+    ;; incrementa el precio de los barrios
     raise-price
+    ;; incrementa la calidad de los barrios
     raise-value
   ]
 end
 
+;; crea los pobres
 to setup-poor
+  ;; inicialmente genera 5
   create-poor 5
   ask poor
   [
+    ;; se le da un color azul
     set color 105
+    ;; forma de casa
     set shape "house"
+    ;; edad entre 0 y 99 años
     set age random 100
+    ;; educacion inicial de 0
     set education 0
+    ;; ubica de manera semi aletoria en una area.
     let radius 10
     setxy ( ( radius / 2 ) - random-float ( radius * 1.0 ) ) ( ( radius / 2 ) - random-float ( radius * 1.0 ) )
+    ;; disminuye el precio de los barrios
     decrease-price
+    ;; disminuye la calidad de los barrios
     decrease-value
   ]
-
 end
 
+;; disminuye la calidad del barrio o celda y sus vecinos al rededor
 to decrease-value
-  ask patch-here [ set quality ( quality * 0.95 ) ]
-  ask patches in-radius 1 [ set quality ( quality * 0.96 ) ]
-  ask patches in-radius 2 [ set quality ( quality * 0.97 ) ]
-  ask patches in-radius 3 [ set quality ( quality * 0.98 ) ]
-  ask patches in-radius 4 [ set quality ( quality * 0.99 )
-    if (quality < 1) [ set quality 1]
+  ask patch-here [ set quality ( quality * 0.95 ) ] ;; -5%
+  ask patches in-radius 1 [ set quality ( quality * 0.96 ) ] ;; -4%
+  ask patches in-radius 2 [ set quality ( quality * 0.97 ) ] ;; -3%
+  ask patches in-radius 3 [ set quality ( quality * 0.98 ) ] ;; -2%
+  ask patches in-radius 4 [ set quality ( quality * 0.99 ) ;; -1%
+    if (quality < 1) [ set quality 1] ;; en el borde a 4 casillas si la calidad es menor a 1 pone el imite en 1. para que no baje a valores negativos.
   ]
 end
 
+;; disminuye la calidad del barrio o celda y los vecinos
 to further-decrease-value
-  ask patch-here [ set quality ( quality * 0.90 ) ]
-  ask patches in-radius 1 [ set quality ( quality * 0.91 ) ]
-  ask patches in-radius 2 [ set quality ( quality * 0.92 ) ]
-  ask patches in-radius 3 [ set quality ( quality * 0.93 ) ]
-  ask patches in-radius 4 [ set quality ( quality * 0.94 )
-    if (quality < 1) [ set quality 1]
+  ask patch-here [ set quality ( quality * 0.90 ) ] ;; -10%
+  ask patches in-radius 1 [ set quality ( quality * 0.91 ) ] ;; -9%
+  ask patches in-radius 2 [ set quality ( quality * 0.92 ) ] ;; -8%
+  ask patches in-radius 3 [ set quality ( quality * 0.93 ) ] ;; -7%
+  ask patches in-radius 4 [ set quality ( quality * 0.94 ) ;; -6%
+    if (quality < 1) [ set quality 1] ;; limita a un valor minimo de 1
   ]
 
 end
 
+;; incrementa el precio de los barrios
 to raise-price
-  ask patch-here [ set price ( price * 1.05 ) ]
-  ask patches in-radius 1 [ set price ( price * 1.04 ) ]
-  ask patches in-radius 2 [ set price ( price * 1.03 ) ]
-  ask patches in-radius 3 [ set price ( price * 1.02 ) ]
-  ask patches in-radius 4 [ set price ( price * 1.01 )
-   if price > 100 [ set price 100 ] ]
+  ask patch-here [ set price ( price * 1.05 ) ] ;; +5%
+  ask patches in-radius 1 [ set price ( price * 1.04 ) ] ;; +4%
+  ask patches in-radius 2 [ set price ( price * 1.03 ) ] ;; +3%
+  ask patches in-radius 3 [ set price ( price * 1.02 ) ] ;; +2%
+  ask patches in-radius 4 [ set price ( price * 1.01 ) ;; +1%
+   if price > 100 [ set price 100 ] ] ;; limita el precio a un maximo de 100
 end
 
+;; incrementa el valor de los barrios cercanos
+;; esta funcion es usada por las universidades
 to further-raise-price
-  ask patch-here [ set price ( price * 1.10 ) ]
-  ask patches in-radius 1 [ set price ( price * 1.09 ) ]
-  ask patches in-radius 2 [ set price ( price * 1.08 ) ]
-  ask patches in-radius 3 [ set price ( price * 1.07 ) ]
-  ask patches in-radius 4 [ set price ( price * 1.06 )
-   if price > 100 [ set price 100 ] ]
+  ask patch-here [ set price ( price * 1.10 ) ] ;; +10%
+  ask patches in-radius 1 [ set price ( price * 1.09 ) ] ;; +9%
+  ask patches in-radius 2 [ set price ( price * 1.08 ) ] ;; +8%
+  ask patches in-radius 3 [ set price ( price * 1.07 ) ] ;; +7%
+  ask patches in-radius 4 [ set price ( price * 1.06 ) ;; + 6%
+   if price > 100 [ set price 100 ] ] ;; define como limite de precio 100
 end
 
+;; incrementa el valor de los barrios cercanos
 to raise-value
-  ask patch-here [ set quality ( quality * 1.05 ) ]
-  ask patches in-radius 1 [ set quality ( quality * 1.04 ) ]
-  ask patches in-radius 2 [ set quality ( quality * 1.03 ) ]
-  ask patches in-radius 3 [ set quality ( quality * 1.02 ) ]
-  ask patches in-radius 4 [ set quality ( quality * 1.01 )
-    if quality > 100 [ set quality 100 ]
+  ask patch-here [ set quality ( quality * 1.05 ) ] ;; +5%
+  ask patches in-radius 1 [ set quality ( quality * 1.04 ) ];; +4%
+  ask patches in-radius 2 [ set quality ( quality * 1.03 ) ];; +3%
+  ask patches in-radius 3 [ set quality ( quality * 1.02 ) ];; +2%
+  ask patches in-radius 4 [ set quality ( quality * 1.01 )  ;; +1%
+    if quality > 100 [ set quality 100 ] ;; limita a un valor de calidad maximo de 100
   ]
 end
 
-
+;; incrementa la calidad de los barrios cercanos
 to further-raise-value
-  ask patch-here [ set quality ( quality * 1.10 ) ]
-  ask patches in-radius 1 [ set quality ( quality * 1.09 ) ]
-  ask patches in-radius 2 [ set quality ( quality * 1.08 ) ]
-  ask patches in-radius 3 [ set quality ( quality * 1.07 ) ]
-  ask patches in-radius 4 [ set quality ( quality * 1.06 )
-    if quality > 100 [ set quality 100 ]
+  ask patch-here [ set quality ( quality * 1.10 ) ]  ;; +10%
+  ask patches in-radius 1 [ set quality ( quality * 1.09 ) ];; +9%
+  ask patches in-radius 2 [ set quality ( quality * 1.08 ) ];; +8%
+  ask patches in-radius 3 [ set quality ( quality * 1.07 ) ];; +7%
+  ask patches in-radius 4 [ set quality ( quality * 1.06 )  ;; +6%
+    if quality > 100 [ set quality 100 ] ;; limita la calidad a maximo 100
   ]
 end
 
+;; disminuye el precio de los barrios
 to decrease-price
-  ask patch-here [ set price ( price * 0.95 ) ]
-  ask patches in-radius 1 [ set price ( price * 0.96 ) ]
-  ask patches in-radius 2 [ set price ( price * 0.97 ) ]
-  ask patches in-radius 3 [ set price ( price * 0.98 ) ]
-  ask patches in-radius 4 [ set price ( price * 0.99 )
-    if (price < 1) [ set price 1]
+  ask patch-here [ set price ( price * 0.95 ) ] ;; -5%
+  ask patches in-radius 1 [ set price ( price * 0.96 ) ];; -4%
+  ask patches in-radius 2 [ set price ( price * 0.97 ) ];; -3%
+  ask patches in-radius 3 [ set price ( price * 0.98 ) ];; -2%
+  ask patches in-radius 4 [ set price ( price * 0.99 )  ;; -1%
+    if (price < 1) [ set price 1]   ;; limita el precio a minimo 1
   ]
 end
 
+;; disminuye el precio de los barrios
 to further-decrease-price
-  ask patch-here [ set price ( price * 0.90 ) ]
-  ask patches in-radius 1 [ set price ( price * 0.91 ) ]
-  ask patches in-radius 2 [ set price ( price * 0.92 ) ]
-  ask patches in-radius 3 [ set price ( price * 0.93 ) ]
-  ask patches in-radius 4 [ set price ( price * 0.94 )
-    if (price < 1) [ set price 1]
+  ask patch-here [ set price ( price * 0.90 ) ] ;; -10%
+  ask patches in-radius 1 [ set price ( price * 0.91 ) ];; -9%
+  ask patches in-radius 2 [ set price ( price * 0.92 ) ];; -8%
+  ask patches in-radius 3 [ set price ( price * 0.93 ) ];; -7%
+  ask patches in-radius 4 [ set price ( price * 0.94 )  ;; -6%
+    if (price < 1) [ set price 1] ;; limita el precio a minimo 1
   ]
 end
+
+
+;; Con esta funcion dependiento del precio se define el tipo de barrio.
+;; guardar el tipo y color del barrio.
+to update-neighborhood
+
+  ;; estables los limites o lineas entre barrios pobres, medios o ricos segun el precio
+  let limite-clase-media 33
+  let limite-ricos 66
+
+  ;; pregunta a todos los barrios
+  ask patches [
+    ;; si su precio es < al limite inferior de clase media, es pobre
+    ifelse (price < limite-clase-media)[
+      ;; type-neighborhood solo se usa para especificar. ya que lo importante es el color para diferenciar los barrios en la vista
+      set type-neighborhood "poor"
+      set color-neighborhood red ;; color de barrio para pobres
+    ][
+      ;; en otro caso pregunta si esta entre medio y ricos
+      ifelse (price >= limite-clase-media and price < limite-ricos)[
+        set type-neighborhood "mid"
+        set color-neighborhood orange ;; color de barrio para clase media
+      ][
+        ;; en otro caso si el precio es mayor al limite inferior de ricos es un barrio de ricos
+        if (price >= limite-ricos)[
+          set type-neighborhood "rich"
+          set color-neighborhood green ;; color de barrio para clase rica
+        ]
+      ]
+    ]
+  ]
+end
+
 
 ;;
 ;; Runtime Procedures
 ;;
 
 to go
+  ;; crea nuevos pobres en cada paso
   locate-poor
+  ;; crea nuevos ricos en cada paso
   locate-rich
+  ;; crea nuevos clase media en cada paso
   locate-mid
+
+  ;; si la cantidad supera el numero de trabajadores por trabjo
   if counter > residents-per-job
   [
+    ;; crea un nuevo trabajo
     locate-service
+    ;; reinicia el contador
     set counter 0
   ]
-    ask poor [
+
+  ;; envejece los pobres 1 año cada paso
+  ask poor [
     set age age + 1
   ]
+  ;; envejece los clase media 1 año cada paso
   ask mid [
     set age age + 1
   ]
+  ;; envejece los ricos 1 año cada paso
   ask rich [
     set age age + 1
   ]
+  ;; evalua y aplica la probabilidad de muerte de los agentes.
   apply-mortality
+  ;; segun la cercania a
   increase-education
   semi-increase-education
   if count (jobs) >= max-jobs [kill-service]
+  ;; cambia el tipo de barrio y el color para la vista por tipo de barrio.
+  update-neighborhood
+  ;; cambia en tiempo real el color de las celdas/patches.
+  ;; si no se quiere cambiar el color del fondo osea las celdas. Solo debe comentar la linea abajo de esta.
+  ask patches [update-patch-color]
+  ;;
   tick
 end
 
+;; aumenta la educacion a los agentes cercanos a la universdiad
 to increase-education
   ask university [
+    ;; elije a los pobres cercanos en un radio de 5 unidades
     let nearby-turtles poor in-radius 5
     ask nearby-turtles [
+      ;;si su educacion es menor a 10 aumenta en 1
       if education < 10 [
         set education education + 1
       ]
     ]
+    ;; funciona de la misma forma para clase media y ricos
     set nearby-turtles mid in-radius 5
     ask nearby-turtles [
       if education < 10 [
@@ -269,14 +421,19 @@ to increase-education
     ]
   ]
 end
+
+;; aumenta la educacion de los agentes cercanos a escuelas
 to semi-increase-education
   ask school [
+    ;; elije a los pobres en un radio de 5 cerca a la escuela
     let nearby-turtles poor in-radius 5
     ask nearby-turtles [
+      ;; si su educacion es inferior a 5 aumenta en 1
       if education < 5 [
         set education education + 1
       ]
     ]
+    ;; funciona de la misma forma para clase media y para ricos
     set nearby-turtles mid in-radius 5
     ask nearby-turtles [
       if education < 5 [
@@ -292,56 +449,92 @@ to semi-increase-education
   ]
 end
 
+;; crea o genera nacimiento de poblacion pobre en cada paso.
+;; dependiendo de la barra "poor-per-step"
 to locate-poor
+  ;; actualiza el contador de pobres
   set counter ( counter + poor-per-step )
+  ;; crea los nuevos pobres
   create-poor poor-per-step
   [
+    ;; asigna un color azul
     set color 105
+    ;; forma de casa
     set shape "house"
+    ;; les asigna una edad de 0 a 99 años de manera aleatoria
     set age random 100
+
+    ;; ubica en el barrio mas barato
     evaluate-poor
+    ;; disminuye la calidad de los barrios
     decrease-value
+    ;; disminye el precio de los barrios
     decrease-price
   ]
 end
 
+;; genera nuevos clase media
 to locate-mid
+  ;; actualiza el contador
   set counter ( counter + mid-per-step )
+  ;; crea los nuevos clase media segun la barra deslizable de la interfaz
   create-mid mid-per-step
   [
+    ;; les da un color cyan
     set color 85
+    ;; forma de casa
     set shape "house"
+    ;; edad entre 0 y 99 años
     set age random 100
+    ;; ubica en el mejor barrio calidad precio
     evaluate-mid
+    ;; incrementa el precio de los barrios
     raise-price
+    ;; incrementa la calidad de los barrios
     raise-value
   ]
 end
 
+;; genera nuevos ricos
 to locate-rich
+  ;; actualiza el contador
   set counter ( counter + rich-per-step )
+  ;;crea los nuevos ricos segun la barra deslizable de la interfaz
   create-rich rich-per-step
   [
+    ;; color magenta
     set color 126
+    ;; forma de casa
     set shape "house"
+    ;; edad entre 0 y 99 años
     set age random 100
+    ;; ubica los ricos en el mejor barrio
     evaluate-rich
+    ;; incrementa el precio de los barrios
     further-raise-price
+    ;; incrementa la calidad de los barrios
     further-raise-value
   ]
 end
 
+
+;;
 to evaluate-poor
+  ;; guarda una lista de barrios candidatos
   let candidate-patches n-of number-of-tests patches
+  ;; filtra los barrios para guardar los que no tienen personas viviendo
   set candidate-patches candidate-patches with [ not any? turtles-here ]
+  ;; si no hay mas candidatos se detiene
   if (not any? candidate-patches)
     [ stop ]
 
-  ;; we use a hedonistic utility function for our agents, shown below
-  ;; basically, poor people are looking for inexpensive real estate, close to jobs
+  ;; selecciona uno de los candidatos
   let best-candidate max-one-of candidate-patches
+  ;; reporta
     [ patch-utility-for-poor ]
+  ;; el agente persona se mueve al barrio candidato
   move-to best-candidate
+  ;; guarda en la persona la utilidad
   set utility-p [ patch-utility-for-poor ] of best-candidate
 end
 
@@ -391,52 +584,64 @@ to-report patch-utility-for-rich
 end
 
 
+;; elimina el trabajo mas antiguo y actualiza las distancias.
 to kill-service
   ; always kill the oldest job
+  ;; los trabajos viejos desaparecen
   ask min-one-of jobs [who]
     [ die ]
+  ;; guarda en los barrios la distancia en una escala que incrementa de a 0.01 desde el barrio al trabajo mas cercano.
   ask patches
+  ;; min elije la distancia mas cercana si tiene varios trabajos cerca.
     [ set sd-dist min [distance myself + .01] of jobs ]
 end
 
+;; crea un trabajo
 to locate-service
+  ;; selecciona los barrios vacios
   let empty-patches patches with [ not any? turtles-here ]
 
+  ;; si hay barrios vacios
   if any? empty-patches
   [
+    ;; pregunta a uno de los barrios
     ask one-of empty-patches
     [
+      ;; crea un agente de raza trabajo
       sprout-jobs 1
       [
+        ;; se les asigna color rojo
         set color red
+        ;; la forma de fabrica
         set shape "factory"
+        ;; tamaño
         set size 2
+        ;; evalua el lugar donde posicionarse
         evaluate-job
       ]
     ]
+
+    ;; actualiza la distancia de los barrios al trabajo mas cercano
     ask patches
       [ set sd-dist min [distance myself + .01] of jobs ]
   ]
 end
 
+;; evalua el mejor lugar para posicionar el trabajo
 to evaluate-job
+  ;; seleccion N barrios candidatos a partir de la barra deslizadora.
   let candidate-patches n-of number-of-tests patches
+  ;; filtra y guarda los que estan vacios
   set candidate-patches candidate-patches with [ not any? turtles-here ]
+  ;; si no quedan candidatos se detiene
   if (not any? candidate-patches)
     [ stop ]
 
-  ;; In this model, we assume that jobs move toward where the money is.
-  ;; The validity of this assumption in a real-world setting is worthy of skepticism.
-  ;;
-  ;; However, it may not be entirely unreasonable. For instance, places with higher real
-  ;; estate values are more likely to have affluent people nearby that will spend money
-  ;; at retail commercial shops.
-  ;;
-  ;; On the other hand, companies would like to pay less rent, and so they may prefer to buy
-  ;; land at low real-estate values
-  ;; (particularly true for industrial sectors, which have no need for consumers nearby)
+  ;; selecciona uno que tenga mayor precio.
   let best-candidate max-one-of candidate-patches [ price ]
+  ;; se mueve al barrio candidato
   move-to best-candidate
+  ;; guarda el precio del barrio
   set utility [ price ] of best-candidate
 end
 
@@ -444,7 +649,7 @@ end
 ;; Visualization Procedures
 ;;
 
-
+;; muestra la media de edad de los pobres
 to-report average-age-poors
   if any? poor [
     report mean [age] of poor
@@ -452,6 +657,7 @@ to-report average-age-poors
   report 0  ; Retorna 0 si no hay poors
 end
 
+;; muestra la media de edad de los clase media
 to-report average-age-mids
   if any? mid [
     report mean [age] of mid
@@ -459,6 +665,7 @@ to-report average-age-mids
   report 0  ; Retorna 0 si no hay mids
 end
 
+;; muestra la media de edad de los ricos
 to-report average-age-richs
   if any? rich [
     report mean [age] of rich
@@ -466,6 +673,7 @@ to-report average-age-richs
   report 0  ; Retorna 0 si no hay richs
 end
 
+;; muestra la media de educacion de los pobres
 to-report average-education-poors
   if any? poor [
     report mean [education] of poor
@@ -473,6 +681,7 @@ to-report average-education-poors
   report 0  ; Retorna 0 si no hay poors
 end
 
+;; muestra la media de educacion de los clase media
 to-report average-education-mids
   if any? mid [
     report mean [education] of mid
@@ -480,6 +689,7 @@ to-report average-education-mids
   report 0  ; Retorna 0 si no hay mids
 end
 
+;; muestra la media de educacion que tienen los ricos
 to-report average-education-richs
   if any? rich [
     report mean [education] of rich
@@ -489,15 +699,19 @@ end
 
 
 to-report death-probability [turtle-age turtle-breed]
+  ;; la mitad de la vida dividido su espectativa de vida, segun la interfaz.
   let base-probability (turtle-age / 2) / life-expectancy-max
   let adjusted-probability base-probability
 
+  ;; si es pobre la probabilidad de muerte se incremente en 5%
   if turtle-breed = "poor" [
     set adjusted-probability adjusted-probability + 0.05
   ]
+  ;; los clase media tienen una probabilidad balanceada
   if turtle-breed = "mid" [
     set adjusted-probability adjusted-probability + 0.00
   ]
+  ;; los ricos tienen una 'reduccion' de la probabilidad de muerte en 5%
   if turtle-breed = "rich" [
     set adjusted-probability adjusted-probability - 0.05
   ]
@@ -505,30 +719,42 @@ to-report death-probability [turtle-age turtle-breed]
   report min list adjusted-probability 1  ; Asegura que la probabilidad no supere 100%
 end
 
+
+;; aplica la probabilidad de muerte de los agentes
 to apply-mortality
+
   ask poor [
+    ;; evalua la probabilidad de muerte segun la edad al tipo pobre
     let prob (death-probability age "poor")
+    ;; si la probabilidad es mayor muere
     if random-float 1 < prob [
       die
     ]
   ]
 
+  ;; evalua la probabilidad de muerte segun la edad en clase media
   ask mid [
     let prob (death-probability age "mid")
+    ;; si la probabilidad es mayor muere
     if random-float 1 < prob [
       die
     ]
   ]
 
   ask rich [
+    ;; evalua la probabilidad de muerte segun la edad y tipo rico
     let prob (death-probability age "rich")
+    ;; si la probabilidad es mayor muere
     if random-float 1 < prob [
       die
     ]
   ]
 end
 
+
+;; convierte una raza a texto
 to-report breed-to-string
+  ;; si es tipo pobre retorna "poor" y asi para media/mid y ricos/rich, en otro caso unknown
   ifelse (breed = poor)
     [report "poor"]
     [ifelse (breed = mid)
@@ -539,16 +765,25 @@ to-report breed-to-string
 end
 
 to update-patch-color
-  ;; the particular constants we use to scale the colors in the display
-  ;; are mainly chosen for visual appeal
+
+  ;; muestra los barrios de colores segun el tipo de vista
+  ;; por defecto esta en modo calidad
   ifelse view-mode = "quality" [
+    ;; en una escala del color verde segun la calidad
     set pcolor scale-color green quality 1 100
   ] [
+    ;; en una escala de amarillos segun el precio
     ifelse view-mode = "price" [
       set pcolor scale-color yellow price 0 100
     ] [
-      if view-mode = "dist" [
+      ;; segun la distancia a los trabajos en una escala de azules
+      ifelse view-mode = "dist" [
         set pcolor scale-color blue sd-dist (0.45 * (max-pxcor * 1.414)) (0.05 * (max-pxcor * 1.414))
+      ][
+        ;; segun el tipo de barrio, pobre, medio, rico. el propio barrio guarda el color en la variable color-neighborhood
+        if view-mode = "neighborhood" [
+          set pcolor color-neighborhood
+        ]
       ]
     ]
   ]
@@ -624,7 +859,7 @@ number-of-tests
 number-of-tests
 0
 60
-30.0
+34.0
 1
 1
 NIL
@@ -720,7 +955,7 @@ rich-per-step
 rich-per-step
 0
 15
-0.0
+1.0
 1
 1
 NIL
@@ -841,7 +1076,7 @@ mid-per-step
 mid-per-step
 0
 15
-8.0
+1.0
 1
 1
 NIL
@@ -983,6 +1218,23 @@ number-store
 1
 NIL
 HORIZONTAL
+
+BUTTON
+370
+10
+472
+43
+Ver Barrios
+set view-mode \"neighborhood\"\nask patches [\n  update-patch-color\n]
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 @#$#@#$#@
