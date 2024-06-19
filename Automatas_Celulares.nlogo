@@ -765,18 +765,6 @@ to apply-mortality
 end
 
 
-;; convierte una raza a texto
-to-report breed-to-string
-  ;; si es tipo pobre retorna "poor" y asi para media/mid y ricos/rich, en otro caso unknown
-  ifelse (breed = poor)
-    [report "poor"]
-    [ifelse (breed = mid)
-      [report "mid"]
-      [ifelse (breed = rich)
-        [report "rich"]
-        [report "unknown"]]]
-end
-
 to update-patch-color
 
   ;; muestra los barrios de colores segun el tipo de vista
@@ -938,7 +926,7 @@ residents-per-job
 residents-per-job
 0
 500
-10.0
+180.0
 10
 1
 NIL
@@ -953,7 +941,7 @@ poor-per-step
 poor-per-step
 0
 15
-5.0
+3.0
 1
 1
 NIL
@@ -1226,7 +1214,7 @@ number-store
 number-store
 0
 15
-5.0
+6.0
 1
 1
 NIL
@@ -1258,7 +1246,7 @@ number-industry
 number-industry
 0
 15
-5.0
+13.0
 1
 1
 NIL
